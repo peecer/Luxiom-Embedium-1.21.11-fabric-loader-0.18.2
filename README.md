@@ -1,29 +1,29 @@
-# Luxium + Embeddium port — Minecraft 1.21.11 (Fabric 0.18.2)
+# Luxium + Embeddium — Minecraft 1.21.11 / Fabric 0.18.2
 
-> **Development status: not a playable mod.** This repository is an authorized port workspace initialized from the supplied 1.20.1 binary releases. No rendering or lighting features are implemented here yet.
+> **WORK IN PROGRESS / NO PLAYABLE RELEASE** — This GitHub repository now includes a Gradle project and compilation bootstraps, but it does **not** contain the original renderer, shaders, mixins or any functional features.
 
-## Target
+This repository has two port targets, **Luxium** (originally Forge 1.20.1 by Vinlanx) and **Embeddium** (original Fabric 1.20.1 binary supplied by the requester). Both must be ported to Minecraft 1.21.11 / Fabric 0.18.2; Java 21 is required.
 
-- Minecraft Java Edition: **1.21.11**
-- Mod loader: **Fabric 0.18.2**
-- Components to port: Luxium (lighting/rendering features), Embeddium (rendering optimization and interoperability)
+## Repository contents
 
-## Original inputs
+- `luxium/`: Fabric client-only entrypoint placeholder.
+- `embeddium/`: Fabric client-only entrypoint placeholder.
+- `settings.gradle` and `gradle.properties`: multi-project Gradle setup.
+- `.github/workflows/gradle.yml`: compile verification on pushes and PRs.
+- `docs/BINARY_AUDIT.md`: hashes, old dependency mismatch and provenance.
+- `PORT_STATUS.md`: feature and validation checklist.
 
-- `Luxium Let there be light-2.8.0-pre-alpha.jar` (compiled older Forge mod)
-- `embeddium-fabric-0.3.25+mc1.20.1.jar` (compiled Fabric 1.20.1 mod)
+## Build setup
 
-The input JARs are reference binaries, not editable source projects. They are intentionally not committed. Retain upstream copyright notices and license text when importing actual source code.
+1. Install Java 21 and Gradle 9.6.0, then run `gradle build` (or generate the Gradle wrapper first).
+2. Check GitHub Actions for compilation results.
+3. **Do not install generated JARs as working mods.** These bootstraps only show how the mod loader can load basic entrypoints.
 
-## Work required
+## Port milestones
 
-1. Obtain/import authorized source for Luxium, including shader assets and mixins; obtain appropriate Embeddium source and notices.
-2. Initialize and validate the Fabric 0.18.2 development toolchain for Minecraft 1.21.11.
-3. Port Minecraft rendering and shader integration, removing obsolete 1.20.1 calls and mixin targets.
-4. Adapt Luxium-to-Embeddium integration; verify whether newer Sodium/Embeddium APIs provide the necessary extension points.
-5. Run a clean compilation, launch the client, verify graphics, and test world loading/performance.
-6. Only publish release JARs after these tests pass.
+1. Import authorized, **editable source** for Luxium and the corresponding Embeddium branch; preserve applicable copyright/license notices.
+2. Port shader resources, options GUI, renderer hooks and mixin targets to 1.21.11.
+3. Rework Luxium-Embeddium integration and dependency/version declarations, including the old binaries' mismatch detailed in the audit.
+4. Compile, launch in Minecraft, test graphics and world loading, then prepare actual releases.
 
-## Current state
-
-See [PORT_STATUS.md](PORT_STATUS.md). No claim of build success or game compatibility is made.
+**A Gradle bootstrap is not a fork of the full implementation.** All inherited original features are currently absent.

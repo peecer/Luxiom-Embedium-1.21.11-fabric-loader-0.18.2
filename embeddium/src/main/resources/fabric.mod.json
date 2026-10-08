@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "embeddium",
+  "version": "${version}",
+  "name": "Embeddium (UNIMPLEMENTED Port Bootstrap)",
+  "description": "Development-only embeddium entrypoint, no original functionality ported. DO NOT DISTRIBUTE AS A MOD.",
+  "authors": [
+    "Porting workspace maintained by peecer"
+  ],
+  "license": "ARR",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.peecer.luxiomport.embeddium.EmbeddiumBootstrap"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.2",
+    "minecraft": "1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
