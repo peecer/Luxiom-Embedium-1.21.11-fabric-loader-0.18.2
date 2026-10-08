@@ -6,7 +6,7 @@ jobs:
   compile:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -20,3 +20,38 @@ jobs:
           gradle-version: '9.7.0'
       - name: Compile port bootstraps
         run: gradle --no-daemon build
+
+      - name: Collect explicitly unimplemented placeholder JARs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dev-builds
+          count=0
+          for file in luxium/build/libs/*-unimplemented-*.jar embeddium/build/libs/*-unimplemented-*.jar; do
+            [[ -f "$file" ]] || continue
+            case "$file" in
+              *-dev.jar|*-sources.jar|*-sources-dev.jar) continue ;;
+            esac
+            cp "$file" "dev-builds/"
+            count=$((count+1))
+          done
+          [[ "$count" -eq 2 ]] || { echo "Expected 2 stub JARs but found $count"; exit 1; }
+          ls -lh dev-builds/*.jar
+      - name: Upload compiled development JARs
+        uses: actions/upload-artifact@v4
+        with:
+          name: development-only-UNIMPLEMENTED-jars
+          path: dev-builds/*.jar
+          if-no-files-found: error
+      - name: Commit compiled stub JARs to repository
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f dev-builds/*.jar
+          if ! git diff --cached --quiet; then
+            git commit -m 'Store compiled UNIMPLEMENTED development stubs [skip ci]'
+            git push origin HEAD:main
+          fi
