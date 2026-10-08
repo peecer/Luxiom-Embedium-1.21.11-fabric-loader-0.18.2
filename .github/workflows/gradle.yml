@@ -1,6 +1,7 @@
 name: Gradle bootstrap compilation
 on:
   push:
+    branches: [main]
   pull_request:
 jobs:
   compile:
@@ -52,3 +53,36 @@ jobs:
             git commit -m 'Store compiled UNIMPLEMENTED development stubs [skip ci]'
             git push origin HEAD:main
           fi
+
+      - name: Package one-click download bundle
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -euo pipefail
+          zip -j "dev-builds/UNIMPLEMENTED-MC-1.21.11-Fabric-0.18.2-BUNDLE.zip" dev-builds/*.jar
+          unzip -l "dev-builds/UNIMPLEMENTED-MC-1.21.11-Fabric-0.18.2-BUNDLE.zip"
+      - name: Publish UNIMPLEMENTED developer prerelease and direct download links
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="unimplemented-bootstrap-0.0.0-dev"
+          cat > dev-release-notes.md <<'NOTES'
+          # UNIMPLEMENTED — Do not install as a finished mod
+
+          This is a **developer-only compiled bootstrap**, not a functional port of Luxium or Embeddium.
+
+          - Minecraft 1.21.11; Fabric 0.18.2
+          - Only mod loader entrypoints are implemented.
+          - No original lighting, shaders, renderer, optimization code, or mixins have been ported.
+          - Not tested in-game. Do not distribute or advertise as usable mods.
+          - The ZIP includes the separate Luxium and Embeddium placeholder JARs.
+          NOTES
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "UNIMPLEMENTED developer bootstrap (1.21.11, Fabric 0.18.2)" --notes-file dev-release-notes.md --prerelease
+          else
+            gh release create "$TAG" --title "UNIMPLEMENTED developer bootstrap (1.21.11, Fabric 0.18.2)" --notes-file dev-release-notes.md --prerelease --target main
+          fi
+          gh release upload "$TAG" dev-builds/*.jar "dev-builds/UNIMPLEMENTED-MC-1.21.11-Fabric-0.18.2-BUNDLE.zip" --clobber
