@@ -27,12 +27,9 @@ jobs:
           set -euo pipefail
           mkdir -p dev-builds
           count=0
-          for file in luxium/build/libs/*-unimplemented-*.jar embeddium/build/libs/*-unimplemented-*.jar; do
+          for file in luxium/build/libs/*0.0.0-dev.jar embeddium/build/libs/*0.0.0-dev.jar; do
             [[ -f "$file" ]] || continue
-            case "$file" in
-              *-dev.jar|*-sources.jar|*-sources-dev.jar) continue ;;
-            esac
-            cp "$file" "dev-builds/"
+            cp "$file" "dev-builds/UNIMPLEMENTED-${file##*/}"
             count=$((count+1))
           done
           [[ "$count" -eq 2 ]] || { echo "Expected 2 stub JARs but found $count"; exit 1; }
