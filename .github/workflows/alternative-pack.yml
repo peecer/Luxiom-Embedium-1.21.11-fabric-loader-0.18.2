@@ -1,0 +1,50 @@
+name: Create real graphics alternative modpack (NOT a Luxium port)
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/build_compatible_pack.py
+      - .github/workflows/alternative-pack.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  alternative-modpack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Resolve real mod versions and create Modrinth modpack
+        run: python tools/build_compatible_pack.py --minecraft 1.21.11 --output "dist/Graphics-Alternative-1.21.11-Fabric-0.19.5-NOT-LUXIUM.mrpack"
+      - name: Upload validated modpack manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: graphics-alternative-1.21.11-NOT-LUXIUM
+          path: dist/Graphics-Alternative-1.21.11-Fabric-0.19.5-NOT-LUXIUM.mrpack
+          if-no-files-found: error
+      - name: Publish separate GitHub prerelease
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > alternative-release-notes.md <<'NOTES'
+          # Alternative graphics pack — NOT Luxium or Embeddium
+
+          This is a separate Modrinth-format launcher profile composed of real compatible project releases: Sodium, Iris, LambDynamicLights, Fabric API, and required dependencies.
+
+          - Minecraft 1.21.11
+          - Fabric Loader 0.19.5 (do not use 0.18.2)
+          - Import the attached .mrpack file as a fresh separate profile.
+          - Remove all previous UNIMPLEMENTED Luxium and Embeddium JARs.
+          - No original Luxium or Embeddium features were ported or modified.
+          - No shaders are included. Import a shader pack separately.
+          - CI validates project versions and manifest; Minecraft gameplay has not been tested.
+          NOTES
+          if gh release view 'graphics-alternative-0.2-1.21.11' >/dev/null 2>&1; then
+            gh release edit 'graphics-alternative-0.2-1.21.11' --title 'Real graphics alternative (1.21.11; NOT Luxium)' --notes-file alternative-release-notes.md --prerelease
+          else
+            gh release create 'graphics-alternative-0.2-1.21.11' --title 'Real graphics alternative (1.21.11; NOT Luxium)' --notes-file alternative-release-notes.md --prerelease --target main
+          fi
+          gh release upload 'graphics-alternative-0.2-1.21.11' "dist/Graphics-Alternative-1.21.11-Fabric-0.19.5-NOT-LUXIUM.mrpack" --clobber
