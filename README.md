@@ -1,3 +1,7 @@
+## CurseForge ZIP with our Luxium development fork included
+
+[Download the CurseForge import pack (1.21.11 / Fabric 0.18.2)](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/releases/download/curseforge-dev-0.1.0-mc1.21.11-fabric0.18.2/Luxiom-Fork-CurseForge-1.21.11-Fabric-0.18.2-DEV.zip). This includes our Luxium **unimplemented** JAR plus compatible graphics mods. The original Luxium features are not functional yet. [Details](CURSEFORGE_PACK.md).
+
 # Download the expanded Luxium-style graphics pack — Minecraft 1.21.11 / Fabric 0.18.2
 
 **[Download the complete real graphics alternative (.mrpack)](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/releases/download/luxium-style-fabric-0.18.2-1.21.11/Luxium-Style-Graphics-1.21.11-Fabric-0.18.2-NOT-LUXIUM.mrpack)**

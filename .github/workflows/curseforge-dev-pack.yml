@@ -1,0 +1,78 @@
+name: Package Luxiom Fork for CurseForge (DEV ONLY)
+on:
+  push:
+    branches: [main]
+    paths:
+      - curseforge/manifest.json
+      - curseforge/README.txt
+      - .github/workflows/curseforge-dev-pack.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch audited fork JAR and create CurseForge export ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p staging/overrides/mods dist
+          curl -fLsS --retry 3 \
+            'https://raw.githubusercontent.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/main/dev-builds/UNIMPLEMENTED-luxium-port-unimplemented-0.0.0-dev.jar' \
+            -o staging/overrides/mods/UNIMPLEMENTED-Luxium-Fork-0.0.0-dev.jar
+          echo '966e9da22fa06449fe9d19b038013a42b4f1f217ce1a4ac8358480efabfe8e70  staging/overrides/mods/UNIMPLEMENTED-Luxium-Fork-0.0.0-dev.jar' | sha256sum -c -
+          cp curseforge/manifest.json staging/manifest.json
+          cp curseforge/README.txt staging/README-BEFORE-IMPORT.txt
+          cp curseforge/README.txt staging/overrides/README-LUXIOM-DEVELOPMENT.txt
+          python - <<'PY'
+          import json,zipfile,pathlib
+          m=json.loads(pathlib.Path('staging/manifest.json').read_text())
+          assert m['manifestVersion']==1 and m['manifestType']=='minecraftModpack'
+          assert m['minecraft']['version']=='1.21.11'
+          assert m['minecraft']['modLoaders']==[{'id':'fabric-0.18.2','primary':True}]
+          assert len(m['files'])==9
+          jar=pathlib.Path('staging/overrides/mods/UNIMPLEMENTED-Luxium-Fork-0.0.0-dev.jar')
+          with zipfile.ZipFile(jar) as z:
+              md=json.loads(z.read('fabric.mod.json'))
+              assert md['id']=='luxium' and md['version']=='0.0.0-dev'
+              assert md['depends']['fabricloader']=='>=0.18.2'
+              assert 'dev/peecer/luxiomport/luxium/LuxiumBootstrap.class' in z.namelist()
+          out=pathlib.Path('dist/Luxiom-Fork-CurseForge-1.21.11-Fabric-0.18.2-DEV.zip')
+          with zipfile.ZipFile(out,'w',zipfile.ZIP_DEFLATED) as z:
+              for p in sorted(pathlib.Path('staging').rglob('*')):
+                  if p.is_file():z.write(p,p.relative_to('staging').as_posix())
+          with zipfile.ZipFile(out) as z:
+              assert z.testzip() is None
+              print('Export valid:',out, 'entries:',z.namelist())
+          PY
+      - name: Upload pack ZIP as GitHub Actions artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Luxiom-Fork-CurseForge-Fabric-0.18.2-DEV
+          path: dist/Luxiom-Fork-CurseForge-1.21.11-Fabric-0.18.2-DEV.zip
+          if-no-files-found: error
+      - name: Publish developer prerelease
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > release-notes.md <<'NOTES'
+          # CurseForge import pack — Luxiom developer fork included
+
+          Minecraft 1.21.11, Fabric Loader **0.18.2** (exact).
+
+          Imports real official CurseForge mods and includes our small Luxium fork entrypoint JAR as an override. Excludes the broken Embeddium identity-conflict stub.
+
+          **Not a finished Luxium port.** Luxium LSR/TFR, special shadows, and rendering code are not implemented. This is a developer testing pack; client launch has not been tested.
+
+          Do not publish as a public CurseForge modpack until requirements for non-CurseForge override mods and licensing are met.
+          NOTES
+          TAG='curseforge-dev-0.1.0-mc1.21.11-fabric0.18.2'
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --notes-file release-notes.md --title 'CurseForge Luxiom Fork Integration DEV — Fabric 0.18.2' --prerelease
+          else
+            gh release create "$TAG" --target main --notes-file release-notes.md --title 'CurseForge Luxiom Fork Integration DEV — Fabric 0.18.2' --prerelease
+          fi
+          gh release upload "$TAG" dist/Luxiom-Fork-CurseForge-1.21.11-Fabric-0.18.2-DEV.zip --clobber

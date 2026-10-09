@@ -1,0 +1,64 @@
+{
+  "minecraft": {
+    "version": "1.21.11",
+    "modLoaders": [
+      {
+        "id": "fabric-0.18.2",
+        "primary": true
+      }
+    ]
+  },
+  "manifestType": "minecraftModpack",
+  "manifestVersion": 1,
+  "name": "Luxiom Fork Integration DEV (NOT a functional Luxium port)",
+  "version": "0.1.0-dev",
+  "author": "peecer / development workspace",
+  "files": [
+    {
+      "projectID": 394468,
+      "fileID": 7348581,
+      "required": true
+    },
+    {
+      "projectID": 455508,
+      "fileID": 7348606,
+      "required": true
+    },
+    {
+      "projectID": 306612,
+      "fileID": 8525513,
+      "required": true
+    },
+    {
+      "projectID": 393442,
+      "fileID": 7321863,
+      "required": true
+    },
+    {
+      "projectID": 686911,
+      "fileID": 8348684,
+      "required": true
+    },
+    {
+      "projectID": 423254,
+      "fileID": 7327812,
+      "required": true
+    },
+    {
+      "projectID": 488090,
+      "fileID": 8028798,
+      "required": true
+    },
+    {
+      "projectID": 1367508,
+      "fileID": 7404478,
+      "required": true
+    },
+    {
+      "projectID": 627557,
+      "fileID": 8884654,
+      "required": true
+    }
+  ],
+  "overrides": "overrides"
+}
