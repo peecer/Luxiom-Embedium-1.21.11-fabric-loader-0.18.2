@@ -7,7 +7,7 @@ jobs:
   compile:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -22,67 +22,6 @@ jobs:
       - name: Compile port bootstraps
         run: gradle --no-daemon build
 
-      - name: Collect explicitly unimplemented placeholder JARs
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p dev-builds
-          count=0
-          for file in luxium/build/libs/*0.0.0-dev.jar embeddium/build/libs/*0.0.0-dev.jar; do
-            [[ -f "$file" ]] || continue
-            cp "$file" "dev-builds/UNIMPLEMENTED-${file##*/}"
-            count=$((count+1))
-          done
-          [[ "$count" -eq 2 ]] || { echo "Expected 2 stub JARs but found $count"; exit 1; }
-          ls -lh dev-builds/*.jar
-      - name: Upload compiled development JARs
-        uses: actions/upload-artifact@v4
-        with:
-          name: development-only-UNIMPLEMENTED-jars
-          path: dev-builds/*.jar
-          if-no-files-found: error
-      - name: Commit compiled stub JARs to repository
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f dev-builds/*.jar
-          if ! git diff --cached --quiet; then
-            git commit -m 'Store compiled UNIMPLEMENTED development stubs [skip ci]'
-            git push origin HEAD:main
-          fi
 
-      - name: Package one-click download bundle
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        shell: bash
-        run: |
-          set -euo pipefail
-          zip -j "dev-builds/UNIMPLEMENTED-MC-1.21.11-Fabric-0.18.2-BUNDLE.zip" dev-builds/*.jar
-          unzip -l "dev-builds/UNIMPLEMENTED-MC-1.21.11-Fabric-0.18.2-BUNDLE.zip"
-      - name: Publish UNIMPLEMENTED developer prerelease and direct download links
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          TAG="unimplemented-bootstrap-0.0.0-dev"
-          cat > dev-release-notes.md <<'NOTES'
-          # UNIMPLEMENTED — Do not install as a finished mod
-
-          This is a **developer-only compiled bootstrap**, not a functional port of Luxium or Embeddium.
-
-          - Minecraft 1.21.11; Fabric 0.18.2
-          - Only mod loader entrypoints are implemented.
-          - No original lighting, shaders, renderer, optimization code, or mixins have been ported.
-          - Not tested in-game. Do not distribute or advertise as usable mods.
-          - The ZIP includes the separate Luxium and Embeddium placeholder JARs.
-          NOTES
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release edit "$TAG" --title "UNIMPLEMENTED developer bootstrap (1.21.11, Fabric 0.18.2)" --notes-file dev-release-notes.md --prerelease
-          else
-            gh release create "$TAG" --title "UNIMPLEMENTED developer bootstrap (1.21.11, Fabric 0.18.2)" --notes-file dev-release-notes.md --prerelease --target main
-          fi
-          gh release upload "$TAG" dev-builds/*.jar "dev-builds/UNIMPLEMENTED-MC-1.21.11-Fabric-0.18.2-BUNDLE.zip" --clobber
+      # NOTE: Compiling placeholder code is a development smoke test only.
+      # We intentionally do NOT publish stub JARs as downloadable mods.
