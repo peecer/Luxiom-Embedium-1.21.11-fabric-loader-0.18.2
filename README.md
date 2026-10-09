@@ -1,23 +1,28 @@
-# Important: the previous JAR releases are NOT functional Minecraft mods
+# Minecraft 1.21.11 — Fabric Loader 0.18.2 ONLY
 
-# Real graphics alternative for Minecraft 1.21.11
+# Minecraft 1.21.11 — strictly Fabric Loader 0.18.2
 
-## What this actually does
-The **old UNIMPLEMENTED .jar downloads are not playable mods**, and they cannot be made working by editing `fabric.mod.json`. They were empty entrypoint prototypes and must be **removed** from your Minecraft mods folder.
+## [Download the real graphics-alternative pack (.mrpack)](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/releases/download/graphics-alternative-fabric-0.18.2-1.21.11/Graphics-Alternative-1.21.11-Fabric-0.18.2-NOT-LUXIUM.mrpack)
 
-**The correct solution for the original screenshot:** install Fabric Loader **0.19.5 or later**, remove the stub Embeddium JAR that conflicts with Sodium, and use real graphics mods. Compact BedWars HUD 1.3 requires 0.19.3+, and Sodium 0.8.4 requires 0.19.5+.
+This version is **Fabric Loader 0.18.2**, not 0.19.5. The selected mod binaries are checked by GitHub Actions for `fabric.mod.json` loader constraints, including bundled Fabric API modules.
 
-## [Download graphics alternative (.mrpack)](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/releases/download/graphics-alternative-0.2-1.21.11/Graphics-Alternative-1.21.11-Fabric-0.19.5-NOT-LUXIUM.mrpack)
+| Component | Pinned release |
+|---|---|
+| Sodium | 0.8.1 (older release, not 0.8.4) |
+| Iris | 1.10.3 (requires Sodium 0.8.1) |
+| LambDynamicLights | 4.9.1 |
+| Fabric API | 0.141.6 |
+| Fabric Loader | **0.18.2** |
 
-You can also visit the [alternative release page](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/releases/tag/graphics-alternative-0.2-1.21.11).
+Install by importing the .mrpack into a **new** Modrinth-compatible launcher instance. Do NOT install .mrpack as a JAR. The original `UNIMPLEMENTED` Luxium/Embeddium JARs must be removed.
 
-This is a **new, clean modpack**, NOT a fork or port of Luxium or Embeddium. It uses genuine **Sodium (rendering/performance), Iris (shader pack compatibility), LambDynamicLights (dynamic lights), and Fabric API**, with required dependencies chosen from official Modrinth version metadata. It does not bundle the actual .jar files: the compatible launcher downloads verified files from Modrinth.
+**Your Compact BedWars HUD 1.3 must also be removed** from this instance because its own metadata requires Fabric Loader 0.19.3 or newer. This pack does not include it, and no compatibility patch for that mod is supplied.
 
-Import the .mrpack into a Modrinth-format pack launcher, create a **separate instance**, then add an optional shader pack. Do not copy your original mods folder over without checking compatibility. The exact Iris/Sodium pairing is selected from dependencies to avoid known version conflicts.
+This is a functional-mod **alternative**, not a port of Luxium or Embeddium. It provides real Sodium optimization, Iris shader compatibility, and dynamic lighting. Add an actual shader pack separately. **No Minecraft client launch test has been performed.**
 
-**Status:** The pack generator and automatic checks validate metadata and version dependencies; no claim of in-game testing. No real Luxium feature code is contained here.
+[See release status](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/releases/tag/graphics-alternative-fabric-0.18.2-1.21.11).
 
-For Forge 26.2, see [Forge alternative](https://github.com/peecer/Luxiom-Embedium-26.2-Forge-65.1.0/blob/main/WORKING_ALTERNATIVE.md).
+---
 
 ---
 

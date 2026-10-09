@@ -17,12 +17,12 @@ jobs:
         with:
           python-version: '3.12'
       - name: Resolve real mod versions and create Modrinth modpack
-        run: python tools/build_compatible_pack.py --minecraft 1.21.11 --output "dist/Graphics-Alternative-1.21.11-Fabric-0.19.5-NOT-LUXIUM.mrpack"
+        run: python tools/build_compatible_pack.py --minecraft 1.21.11 --output "dist/Graphics-Alternative-1.21.11-Fabric-0.18.2-NOT-LUXIUM.mrpack"
       - name: Upload validated modpack manifest
         uses: actions/upload-artifact@v4
         with:
           name: graphics-alternative-1.21.11-NOT-LUXIUM
-          path: dist/Graphics-Alternative-1.21.11-Fabric-0.19.5-NOT-LUXIUM.mrpack
+          path: dist/Graphics-Alternative-1.21.11-Fabric-0.18.2-NOT-LUXIUM.mrpack
           if-no-files-found: error
       - name: Publish separate GitHub prerelease
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
@@ -32,19 +32,19 @@ jobs:
           cat > alternative-release-notes.md <<'NOTES'
           # Alternative graphics pack — NOT Luxium or Embeddium
 
-          This is a separate Modrinth-format launcher profile composed of real compatible project releases: Sodium, Iris, LambDynamicLights, Fabric API, and required dependencies.
+          This is a separate Modrinth-format launcher profile pinning the 1.21.11 Sodium 0.8.1 / Iris 1.10.3 pairing, LambDynamicLights 4.9.1, Fabric API 0.141.6 and required dependencies. It is NOT a port.
 
           - Minecraft 1.21.11
-          - Fabric Loader 0.19.5 (do not use 0.18.2)
+          - Fabric Loader **0.18.2**, exact version (do not upgrade this target)
           - Import the attached .mrpack file as a fresh separate profile.
           - Remove all previous UNIMPLEMENTED Luxium and Embeddium JARs.
           - No original Luxium or Embeddium features were ported or modified.
           - No shaders are included. Import a shader pack separately.
-          - CI validates project versions and manifest; Minecraft gameplay has not been tested.
+          - CI validates project versions, JAR checksums, fabric.mod.json loader requirements (including nested Fabric modules), and manifest; Minecraft gameplay has not been tested.
           NOTES
-          if gh release view 'graphics-alternative-0.2-1.21.11' >/dev/null 2>&1; then
-            gh release edit 'graphics-alternative-0.2-1.21.11' --title 'Real graphics alternative (1.21.11; NOT Luxium)' --notes-file alternative-release-notes.md --prerelease
+          if gh release view 'graphics-alternative-fabric-0.18.2-1.21.11' >/dev/null 2>&1; then
+            gh release edit 'graphics-alternative-fabric-0.18.2-1.21.11' --title 'Graphics alternative (1.21.11; Fabric 0.18.2; NOT Luxium)' --notes-file alternative-release-notes.md --prerelease
           else
-            gh release create 'graphics-alternative-0.2-1.21.11' --title 'Real graphics alternative (1.21.11; NOT Luxium)' --notes-file alternative-release-notes.md --prerelease --target main
+            gh release create 'graphics-alternative-fabric-0.18.2-1.21.11' --title 'Graphics alternative (1.21.11; Fabric 0.18.2; NOT Luxium)' --notes-file alternative-release-notes.md --prerelease --target main
           fi
-          gh release upload 'graphics-alternative-0.2-1.21.11' "dist/Graphics-Alternative-1.21.11-Fabric-0.19.5-NOT-LUXIUM.mrpack" --clobber
+          gh release upload 'graphics-alternative-fabric-0.18.2-1.21.11' "dist/Graphics-Alternative-1.21.11-Fabric-0.18.2-NOT-LUXIUM.mrpack" --clobber

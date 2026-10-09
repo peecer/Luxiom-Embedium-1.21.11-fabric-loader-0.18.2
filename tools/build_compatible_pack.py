@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Build REAL graphics-alternative Modrinth modpacks. NOT a Luxium or Embeddium port."""
 import argparse
+import hashlib
+import io
+import re
 import json
 import sys
 import urllib.parse
@@ -10,7 +13,16 @@ from pathlib import Path
 
 API="https://api.modrinth.com/v2"
 ROOTS=("iris","lambdynamiclights","fabric-api","sodium")
-AGENT="LuxiomGraphicsAlternative/0.2 (GitHub Actions; dependency resolver)"
+LOADER="0.18.2"
+# Iris 1.10.3 requires Sodium 0.8.1. Later builds may impose newer loader requirements.
+# 0.8.1 also avoids the original 0.8.0 / Fabric API rendering integration bug.
+PINS={
+  "iris":"CTILw1NK",
+  "lambdynamiclights":"5Tp7kdU0",
+  "fabric-api":"6qAuTtLR",
+  "sodium":"2IxKzI1o",
+}
+AGENT="LuxiomGraphicsAlternative/0.18.2 (GitHub Actions; Fabric Loader metadata validator)"
 
 class PackError(Exception):
     pass
@@ -59,6 +71,8 @@ class Resolver:
             raise PackError("Circular dependency for "+obj["title"])
         self.visiting.add(pid)
         try:
+            if not pinned and obj.get("slug") in PINS:
+                pinned=PINS[obj["slug"]]
             version=get("/version/"+pinned) if pinned else latest(pid,self.mc)
             if version.get("project_id")!=pid or self.mc not in version.get("game_versions",[]) or "fabric" not in version.get("loaders",[]):
                 raise PackError("Incompatible dependency "+obj["title"]+" "+str(version.get("version_number")))
@@ -102,10 +116,78 @@ class Resolver:
                     raise PackError("Declared incompatible version in "+e["project"]["title"])
         return sorted(self.mods.values(),key=lambda e:e["project"]["title"])
 
+def compat_number(text):
+    m=re.fullmatch(r"(\d+)\.(\d+)\.(\d+)",text)
+    if not m:
+        raise PackError("Cannot parse Fabric Loader version expression: "+repr(text))
+    return tuple(map(int,m.groups()))
+
+def allows_loader(expr,loader):
+    if expr is None:
+        return True
+    if isinstance(expr,list):
+        return any(allows_loader(item,loader) for item in expr)
+    if not isinstance(expr,str):
+        raise PackError("Unsupported Fabric Loader constraint: "+repr(expr))
+    if expr.strip()=="*":
+        return True
+    target=compat_number(loader)
+    for token in expr.split():
+        m=re.fullmatch(r"(>=|<=|>|<|=|~)?(\d+\.\d+\.\d+)",token)
+        if not m:
+            raise PackError("Unsupported Fabric Loader range token "+repr(token))
+        op,v=m.group(1) or "=",compat_number(m.group(2))
+        if not {
+            ">=":target>=v,"<=":target<=v,">":target>v,
+            "<":target<v,"=":target==v,"~":target[0:2]==v[0:2] and target>=v,
+        }[op]:
+            return False
+    return True
+
+def validate_binary_files(mods,loader):
+    """
+    Fail the build if ANY selected JAR (including nested Fabric modules)
+    requires a newer loader. Modrinth release-page compatibility alone is
+    insufficient to catch Fabric Loader metadata constraints.
+    """
+    for mod in mods:
+        file=mod["file"]
+        url=file["url"]
+        request=urllib.request.Request(url,headers={"User-Agent":AGENT})
+        try:
+            with urllib.request.urlopen(request,timeout=90) as response:
+                jar_data=response.read()
+        except Exception as exc:
+            raise PackError("Failed to inspect "+file["filename"]+": "+str(exc)) from exc
+        if hashlib.sha512(jar_data).hexdigest()!=file["hashes"]["sha512"]:
+            raise PackError("SHA-512 checksum mismatch: "+file["filename"])
+        try:
+            with zipfile.ZipFile(io.BytesIO(jar_data)) as jar:
+                def validate_metadata(z,depth):
+                    if depth>4:
+                        raise PackError("Nested Fabric JARs too deep: "+file["filename"])
+                    meta=json.loads(z.read("fabric.mod.json"))
+                    modid=meta.get("id","unknown")
+                    constraint=meta.get("depends",{}).get("fabricloader")
+                    if not allows_loader(constraint,loader):
+                        raise PackError("{} in {} requires Fabric Loader {}, not {}".format(
+                            modid,file["filename"],constraint,loader))
+                    print("Loader OK:",modid,repr(constraint),"for",loader,flush=True)
+                    for item in meta.get("jars",[]):
+                        name=item.get("file")
+                        if name and name in z.namelist():
+                            with zipfile.ZipFile(io.BytesIO(z.read(name))) as embedded:
+                                if "fabric.mod.json" in embedded.namelist():
+                                    validate_metadata(embedded,depth+1)
+                validate_metadata(jar,0)
+        except (OSError,ValueError,KeyError,zipfile.BadZipFile) as exc:
+            raise PackError("Invalid Fabric JAR "+file["filename"]+": "+str(exc)) from exc
+
 def build(mc,output):
     mods=Resolver(mc).collect()
     if len(mods)<4:
         raise PackError("Not all four required graphics components could be resolved")
+    validate_binary_files(mods,LOADER)
     files=[]
     used=set()
     for mod in mods:
@@ -124,14 +206,14 @@ def build(mc,output):
     index={
         "formatVersion":1,
         "game":"minecraft",
-        "versionId":mc+"-graphics-alternative-0.2",
+        "versionId":mc+"-graphics-alternative-Fabric-0.18.2",
         "name":"Graphics Alternative (NOT Luxium) "+mc,
         "summary":"Real Sodium, Iris, LambDynamicLights, Fabric API, and required dependencies; not a Luxium or Embeddium port.",
         "files":files,
-        "dependencies":{"minecraft":mc,"fabric-loader":"0.19.5"},
+        "dependencies":{"minecraft":mc,"fabric-loader":LOADER},
     }
     notes=("NOT A LUXIUM OR EMBEDDIUM PORT. Import in a NEW, CLEAN Fabric instance.\n"
-           "Requires Fabric Loader 0.19.5 or newer. Never install the prior UNIMPLEMENTED JARs.\n"
+           "Requires exactly Fabric Loader 0.18.2. Never install the prior UNIMPLEMENTED JARs.\n"
            "Iris supports shaders but a shader pack must be installed separately.\n"
            "Minecraft client startup has not been tested by this build pipeline.\n")
     output=Path(output)
@@ -141,6 +223,7 @@ def build(mc,output):
         archive.writestr("README.txt",notes)
         archive.writestr("COMPONENTS.txt","\n".join(f'{x["project"]["title"]}: {x["version"]["version_number"]}' for x in mods)+"\n")
     print("Created",output)
+    print("Fabric Loader",LOADER,"checked against every selected and nested fabric.mod.json")
     for x in mods:
         print(x["project"]["title"],x["version"]["version_number"])
 

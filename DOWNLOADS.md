@@ -1,17 +1,21 @@
-# Download compatible graphics alternative — Minecraft 1.21.11
+# Minecraft 1.21.11 — strictly Fabric Loader 0.18.2
 
-## [Get the genuine modpack (.mrpack)](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/releases/download/graphics-alternative-0.2-1.21.11/Graphics-Alternative-1.21.11-Fabric-0.19.5-NOT-LUXIUM.mrpack)
+## [Download the real graphics-alternative pack (.mrpack)](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/releases/download/graphics-alternative-fabric-0.18.2-1.21.11/Graphics-Alternative-1.21.11-Fabric-0.18.2-NOT-LUXIUM.mrpack)
 
-**Use Fabric Loader 0.19.5 or newer** and import this .mrpack into a **NEW instance** using a Modrinth-format modpack launcher. Do not mix it with your existing mods until you have verified their requirements.
+This version is **Fabric Loader 0.18.2**, not 0.19.5. The selected mod binaries are checked by GitHub Actions for `fabric.mod.json` loader constraints, including bundled Fabric API modules.
 
-This pack selects official versions of **Sodium, Iris Shaders, LambDynamicLights and Fabric API** using the Modrinth project API. It also resolves required dependencies and checks declared conflicts.
+| Component | Pinned release |
+|---|---|
+| Sodium | 0.8.1 (older release, not 0.8.4) |
+| Iris | 1.10.3 (requires Sodium 0.8.1) |
+| LambDynamicLights | 4.9.1 |
+| Fabric API | 0.141.6 |
+| Fabric Loader | **0.18.2** |
 
-**It is NOT a port or fork of Luxium or Embeddium.** The real modpack supports rendering acceleration, shader-pack loading and dynamic lighting; it does not reproduce Luxium's custom shadow/fog pipeline. An additional shader pack is needed for shader effects. The pack generator passed its build checks, but Minecraft gameplay has not been tested.
+Install by importing the .mrpack into a **new** Modrinth-compatible launcher instance. Do NOT install .mrpack as a JAR. The original `UNIMPLEMENTED` Luxium/Embeddium JARs must be removed.
 
-[Open the GitHub release](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/releases/tag/graphics-alternative-0.2-1.21.11) | [View builder source](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/blob/main/tools/build_compatible_pack.py)
+**Your Compact BedWars HUD 1.3 must also be removed** from this instance because its own metadata requires Fabric Loader 0.19.3 or newer. This pack does not include it, and no compatibility patch for that mod is supplied.
 
-## ⚠️ The old JAR downloads below are broken prototypes
+This is a functional-mod **alternative**, not a port of Luxium or Embeddium. It provides real Sodium optimization, Iris shader compatibility, and dynamic lighting. Add an actual shader pack separately. **No Minecraft client launch test has been performed.**
 
-The previously published `UNIMPLEMENTED-...` Luxium and Embeddium JARs have no original code. **Remove them from your mods folder. Do not download or install them.** They cause mod-ID collisions with working Sodium versions.
-
-[See what still needs porting](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/blob/main/PORT_STATUS.md).
+[See release status](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/releases/tag/graphics-alternative-fabric-0.18.2-1.21.11).
