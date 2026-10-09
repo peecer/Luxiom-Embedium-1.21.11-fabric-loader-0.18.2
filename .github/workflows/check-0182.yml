@@ -1,0 +1,18 @@
+name: Inspect real mod requirements for 0.18.2
+on:
+  push:
+    paths:
+      - tools/inspect_0182.py
+      - .github/workflows/check-0182.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python tools/inspect_0182.py
