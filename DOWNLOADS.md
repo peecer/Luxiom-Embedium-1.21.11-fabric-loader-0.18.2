@@ -1,33 +1,17 @@
-# Downloads — 1.21.11, Fabric 0.18.2
+# Download compatible graphics alternative — Minecraft 1.21.11
 
-> ⚠️ **DEVELOPMENT PLACEHOLDERS ONLY — NOT FUNCTIONAL MODS.**
-> These compiled JARs contain no original Luxium lighting/shaders and no Embeddium rendering optimizations.
-> They have only loader entrypoints. **Do not install them expecting playable features.**
+## [Get the genuine modpack (.mrpack)](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/releases/download/graphics-alternative-0.2-1.21.11/Graphics-Alternative-1.21.11-Fabric-0.19.5-NOT-LUXIUM.mrpack)
 
-## One-click downloads
+**Use Fabric Loader 0.19.5 or newer** and import this .mrpack into a **NEW instance** using a Modrinth-format modpack launcher. Do not mix it with your existing mods until you have verified their requirements.
 
-**[Download 1.21.11 development bundle (ZIP)](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/releases/download/unimplemented-bootstrap-0.0.0-dev/UNIMPLEMENTED-MC-1.21.11-Fabric-0.18.2-BUNDLE.zip)** — contains both placeholder JARs.
+This pack selects official versions of **Sodium, Iris Shaders, LambDynamicLights and Fabric API** using the Modrinth project API. It also resolves required dependencies and checks declared conflicts.
 
-[GitHub prerelease page](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/releases/tag/unimplemented-bootstrap-0.0.0-dev) | [View all repository binaries](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/tree/main/dev-builds)
+**It is NOT a port or fork of Luxium or Embeddium.** The real modpack supports rendering acceleration, shader-pack loading and dynamic lighting; it does not reproduce Luxium's custom shadow/fog pipeline. An additional shader pack is needed for shader effects. The pack generator passed its build checks, but Minecraft gameplay has not been tested.
 
-### Individual JAR files
+[Open the GitHub release](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/releases/tag/graphics-alternative-0.2-1.21.11) | [View builder source](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/blob/main/tools/build_compatible_pack.py)
 
-- [Download UNIMPLEMENTED-luxium-port-unimplemented-0.0.0-dev.jar directly](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/raw/refs/heads/main/dev-builds/UNIMPLEMENTED-luxium-port-unimplemented-0.0.0-dev.jar)
-- [Download UNIMPLEMENTED-embeddium-port-unimplemented-0.0.0-dev.jar directly](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/raw/refs/heads/main/dev-builds/UNIMPLEMENTED-embeddium-port-unimplemented-0.0.0-dev.jar)
+## ⚠️ The old JAR downloads below are broken prototypes
 
-These direct JAR links are available even if the GitHub prerelease has not yet been generated.
+The previously published `UNIMPLEMENTED-...` Luxium and Embeddium JARs have no original code. **Remove them from your mods folder. Do not download or install them.** They cause mod-ID collisions with working Sodium versions.
 
-## Other Minecraft versions
-
-- [1.21.11 (Fabric 0.18.2)](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/blob/main/DOWNLOADS.md)
-- [26.3 (Fabric 0.19.5)](https://github.com/peecer/Luxiom-Embedium-26.3-fabric-loader-0.19.5/blob/main/DOWNLOADS.md)
-- [26.2 (Forge 65.1.0)](https://github.com/peecer/Luxiom-Embedium-26.2-Forge-65.1.0/blob/main/DOWNLOADS.md)
-
-## Verification
-
-- Exact version: Minecraft **1.21.11**, **Fabric 0.18.2**.
-- Binary contents: **minimal test bootstrap only**.
-- GitHub Actions compiles JARs and publishes the UNIMPLEMENTED prerelease and bundle.
-- Not Minecraft-client tested; not a full port, not suitable for modpacks.
-
-**Development note:** The original Luxium and Embeddium implementations and compatible shaders/mixins must be ported before any real release.
+[See what still needs porting](https://github.com/peecer/Luxiom-Embedium-1.21.11-fabric-loader-0.18.2/blob/main/PORT_STATUS.md).
